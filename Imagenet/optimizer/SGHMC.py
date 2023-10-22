@@ -26,6 +26,8 @@ class SGHMC(Optimizer):
         self.k = None
         self.t = None
         self.annealing = 1.
+        self.quantizeList = []
+        self.save_hessian = None
         self.mGroups = []
         mGroupsIndex = -1
         for group in self.param_groups:
@@ -64,7 +66,7 @@ class SGHMC(Optimizer):
                         '\t\t\t  loss.backward(), make sure the option create_graph is\n' +
                         '\t\t\t  set to True.')
 
-        v = [2 * torch.randint_like(p, high=2) - 1]
+        v = 2 * torch.randint_like(p, high=2) - 1
 
         for v_i in v:
             v_i[v_i < 0.] = -1.
@@ -75,7 +77,7 @@ class SGHMC(Optimizer):
             p,
             grad_outputs=v,
             only_inputs=True,
-            retain_graph=True)
+            retain_graph=True)[0]
 
         param_size = hv.size()
         if len(param_size) <= 2:  # for 0/1/2D tensor
@@ -96,8 +98,12 @@ class SGHMC(Optimizer):
             if lr:
                 group["lr"] = lr
             for j, (p, mp) in enumerate(zip(group["params"], mGroup)):
-                if self.MH and group["quantize"][j]:
-                    hessian = torch.norm(self.get_trace(p, p.grad)) ** 2
+                if self.MH and self.quantizeList[j]:
+                    if self.save_hessian is not None:
+                        hessian = self.save_hessian
+                        self.save_hessian = None
+                    else:
+                        hessian = torch.norm(self.get_trace(p, p.grad)).item() ** 2
 
                 d_p = p.grad.data + p / (self.priorSigma ** 2)
 
@@ -117,7 +123,7 @@ class SGHMC(Optimizer):
                 p.data.add_(mp, alpha=(0.5 if half else 1) * group["lr"])
 
                 # calculate M-H transition probability
-                if self.MH and group["quantize"][j]:
+                if self.MH and self.quantizeList[j]:
                     dist1 = torch.norm(temp2 + group["lr"] * temp * (0.5 if half else 1) - p)**2 #q(θ_t+1|θ_t)
                     if(self.lastP[i][j] is not None):
                         dist2 = torch.norm(temp2 + group["lr"] * temp * self.lastM - self.lastP[i][j])**2 #q(θ_t-1|θ_t)
@@ -128,17 +134,18 @@ class SGHMC(Optimizer):
                     dist = (dist1.item() - dist2.item())
 
                     beta_w = temp2.mean((1,2,3)).view(-1,1,1,1)
-                    alpha_w = torch.sqrt(((temp2-beta_w)**2).sum((1,2,3))/self.filter_size).view(-1,1,1,1)
-                    alpha = torch.norm(alpha_w) ** 2
+                    alpha_w = torch.sqrt(((temp2-beta_w)**2).mean((1,2,3))).view(-1,1,1,1)
+                    alpha = torch.norm(alpha_w).item() ** 2
                     self.paramProb += dist / (8 * group["lr"] ** 2 * alpha * hessian)
 
     def getParamProb(self):
         for i, (group, mGroup) in enumerate(zip(self.param_groups, self.mGroups)):
             for j, (p, mp) in enumerate(zip(group["params"], mGroup)):
-                if not group["quantize"][j]:
+                if not self.quantizeList[j]:
                     continue
 
-                hessian = torch.norm(self.get_trace(p, p.grad)) ** 2
+                hessian = torch.norm(self.get_trace(p, p.grad)).item() ** 2
+                self.save_hessian = hessian
 
                 temp = p.grad.data + p / (self.priorSigma ** 2)
 
@@ -151,8 +158,8 @@ class SGHMC(Optimizer):
                 self.lastM = 1
 
                 beta_w = p.mean((1,2,3)).view(-1,1,1,1)
-                alpha_w = torch.sqrt(((p-beta_w)**2).sum((1,2,3))/self.filter_size).view(-1,1,1,1)
-                alpha = torch.norm(alpha_w) ** 2
+                alpha_w = torch.sqrt(((p-beta_w)**2).mean((1,2,3))).view(-1,1,1,1)
+                alpha = torch.norm(alpha_w).item() ** 2
                 self.paramProb -= dist2.item() / (8 * group["lr"] ** 2 * alpha * hessian)
 
         temp = self.paramProb

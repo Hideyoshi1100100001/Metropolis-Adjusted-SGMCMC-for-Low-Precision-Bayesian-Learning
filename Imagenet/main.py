@@ -5,7 +5,7 @@ import os
 import shutil
 
 import sys
-sys.path.append("./MHimagenet/lib/python3.6/site-packages")
+sys.path.append("../../MHimagenet/lib/python3.6/site-packages")
 
 import argparse
 import numpy as np
@@ -36,8 +36,8 @@ parser = argparse.ArgumentParser(description='ResNets with Metropolis-Hastings f
 
 #data
 
-parser.add_argument('-d', '--data', default='../../../../data/chaodu/imagenet_data', type=str)
-parser.add_argument('-j', '--workers', default=8, type=int, metavar='N',
+parser.add_argument('-d', '--data', default='../../../LargeData/Large/ImageNet', type=str)
+parser.add_argument('-j', '--workers', default=32, type=int, metavar='N',
                     help='number of data loading workers (default: 8)')
 parser.add_argument('--gpu-id', default='0,1,2,3,4,5,6,7', type=str,
                     help='id(s) for CUDA_VISIBLE_DEVICES')
@@ -45,24 +45,24 @@ parser.add_argument('--gpu-id', default='0,1,2,3,4,5,6,7', type=str,
 #optimization
 
 parser.add_argument('--fp', action='store_true', help='full precision')
-parser.add_argument('--epochs', default=100, type=int, metavar='N',
+parser.add_argument('--epochs', default=120, type=int, metavar='N',
                     help='number of total epochs to run')
 parser.add_argument('--start-epoch', default=0, type=int, metavar='N',
                     help='manual epoch number (useful on restarts)')
 parser.add_argument('--end-epoch', default=0, type=int, metavar='N',
                     help='manual end epoch number')
-parser.add_argument('-b', '--batch-size', default=100, type=int,
-                    metavar='N', help='mini-batch size (default: 100)')
-parser.add_argument('--lr', '--learning-rate', default=0.1, type=float,
+parser.add_argument('-b', '--batch-size', default=512, type=int,
+                    metavar='N', help='mini-batch size (default: 512)')
+parser.add_argument('--lr', '--learning-rate', default=0.2, type=float,
                     metavar='LR', help='initial learning rate')
-parser.add_argument('--temperature', default=1e-8, type=float, help='factor that multiplies gaussian noise')
+parser.add_argument('--temperature', default=0, type=float, help='factor that multiplies gaussian noise')
 parser.add_argument('--annealing', default=1, type=float, help='(0, 1], the lower bound of anneal temperature')
 parser.add_argument('--momentumDecay', default=0.1, type=float, metavar='M',
                     help='momentum decay')
 parser.add_argument('--priorSigma', '--pS', default=1e2, type=float,
                     metavar='P', help='equivalent to weight decay (default: 1e2 -> 1e-4)')
-parser.add_argument('--quantizeDecay', '--qd', default=0, type=float, help='decay the real weight to the quantized (default: 1e-4)')
-parser.add_argument('--transitionKernel', '--tk', type=float, default=[0.9, 1], nargs='+', help='possibility of using different transition kernel, [0]: default, [1] - [0]: flip')
+parser.add_argument('--quantizeDecay', '--qd', default=0, type=float, help='decay the real weight to the quantized (default: 0)')
+parser.add_argument('--transitionKernel', '--tk', type=float, default=[1, 1], nargs='+', help='possibility of using different transition kernel, [0]: default, [1] - [0]: flip')
 parser.add_argument('--flipPossibility', default=0.05, type=float, help='[0,1], possibility of flipping element wise when transision kernel is random flip')
 parser.add_argument('--fixed_lr', action='store_true', help='fix the learning rate')
 
@@ -89,7 +89,7 @@ parser.add_argument('--ecebins', default=15, type=int, help='numbers of ECE bins
 #Metropolist-Hastings
 
 parser.add_argument('--MH', action='store_true', help='MH or pure SGLD')
-parser.add_argument('--MHInterval', default=5, type=int, help='iterations between two MH tests')
+parser.add_argument('--MHInterval', default=50, type=int, help='iterations between two MH tests')
 parser.add_argument('--MHEpsilon', default=2e-1, type=float, help='[0,1], larger->easier to pass MH test')
 parser.add_argument('--debug_show_prob', action='store_true', help='show the probability about MH test')
 
@@ -186,8 +186,7 @@ def Metropolis_Hastings(Ocur, Onext, Mcur, Mnext):
     paramProb = -5000000
     if Ocur.paramProb is None:
         Ocur.paramProb = -5000000
-    else:
-        paramProb = Onext.getParamProb()
+    paramProb = Onext.getParamProb()
     total = 0
     randomValue = torch.rand(1).item()
 
@@ -264,9 +263,9 @@ def train(start_epoch, best_prec, model, train_loader, test_loader, optimizer, l
     )
     for name, _ in bestModel.named_parameters():
         if "layer" in name and "conv" in name and "weight" in name:
-            bestOpt.param_groups[0]["quantize"].append(True)
+            bestOpt.quantizeList.append(True)
         else:
-            bestOpt.param_groups[0]["quantize"].append(False)
+            bestOpt.quantizeList.append(False)
     if(args.LoadPath != ''):
         checkpoint = torch.load(os.path.join(args.LoadPath, "checkpoint.pth"))
         bestModel.load_state_dict(checkpoint['state_dict'])
@@ -328,7 +327,7 @@ def train(start_epoch, best_prec, model, train_loader, test_loader, optimizer, l
                 t5pred = torch.topk(output.data, k=5, dim=1, largest=True)[1]
                 #print(output,'\n')
                 optimizer.zero_grad()
-                loss.backward()
+                loss.backward(create_graph=True)
 
                 if (False == args.MH):
                     optimizer.step()
@@ -511,9 +510,9 @@ for _ in range(args.deepEnsemble):
     )
     for name, _ in model.named_parameters():
         if "layer" in name and "conv" in name and "weight" in name:
-            optimizer.param_groups[0]["quantize"].append(True)
+            optimizer.quantizeList.append(True)
         else:
-            optimizer.param_groups[0]["quantize"].append(False)
+            optimizer.quantizeList.append(False)
     start_epoch = args.start_epoch
     best_prec = 0
     if(args.LoadPath != ''):

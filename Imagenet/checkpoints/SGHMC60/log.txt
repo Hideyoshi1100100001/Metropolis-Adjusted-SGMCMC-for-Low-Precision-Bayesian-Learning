@@ -1,0 +1,35 @@
+data:	../../../LargeData/Large/ImageNet
+workers:	32
+gpu_id:	0,1,2,3,4,5,6
+fp:	False
+epochs:	120
+start_epoch:	0
+end_epoch:	60
+batch_size:	512
+lr:	0.2
+temperature:	0.0
+annealing:	1
+momentumDecay:	0.1
+priorSigma:	100.0
+quantizeDecay:	0
+transitionKernel:	[1, 1]
+flipPossibility:	0.05
+fixed_lr:	False
+LoadPath:	
+SavePath:	./checkpoints/SGHMC60
+saveInterval:	1
+evaluate:	False
+sampleNumber:	10
+sampleInterval:	1
+deepEnsemble:	1
+ece:	False
+ecebins:	15
+MH:	False
+MHInterval:	5
+MHEpsilon:	0.2
+debug_show_prob:	False
+manualSeed:	1275
+Epoch: 0	LearningRate: 0.2	StepTemperature:0.0
+Epoch: 0	Time: 4919.9s	Train Loss: 5.725	Train Acc: 4.932%	Train ECE: 0.000
+Val Loss: 5.082	Val Acc: 9.310	Val top5 Acc: 23.528	Val ECE: 0.000	Best Acc: 9.310
+Epoch: 1	LearningRate: 0.19996573249755573	StepTemperature:0.0
