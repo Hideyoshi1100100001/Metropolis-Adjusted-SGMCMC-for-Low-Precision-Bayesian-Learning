@@ -3,3 +3,6 @@
 
 # checkpoints
 *.pth.tar
+
+# test file
+test.py

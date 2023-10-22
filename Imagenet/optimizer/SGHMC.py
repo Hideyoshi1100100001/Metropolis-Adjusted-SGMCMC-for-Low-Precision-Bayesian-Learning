@@ -8,6 +8,7 @@ class SGHMC(Optimizer):
         optim,
         grad_scaling=1.0,
         MH=False,
+        noise=False,
         temperature=1.0,
         datasize=None,
         mDecay=0.1,
@@ -34,6 +35,7 @@ class SGHMC(Optimizer):
                 p.grad = torch.zeros(p.shape).cuda()
                 self.mGroups[mGroupsIndex].append(torch.randn(p.shape).cuda() * np.sqrt(lr / datasize))
         self.MH = MH
+        self.noise = noise
         self.temperature = temperature
         self.datasize = datasize
         self.mDecay = mDecay
@@ -48,6 +50,44 @@ class SGHMC(Optimizer):
     def getTemperature(self, temp):
         self.temperature = temp
 
+    def get_trace(self, p, grad):
+        """
+        compute the Hessian vector product with a random vector v, at the current gradient point,
+        i.e., compute the gradient of <gradsH,v>.
+        :param gradsH: a list of torch variables
+        :return: a list of torch tensors
+        """
+
+        # Check backward was called with create_graph set to True
+        if grad.grad_fn is None:
+            raise RuntimeError('Gradient tensor does not have grad_fn. When calling\n' +
+                        '\t\t\t  loss.backward(), make sure the option create_graph is\n' +
+                        '\t\t\t  set to True.')
+
+        v = [2 * torch.randint_like(p, high=2) - 1]
+
+        for v_i in v:
+            v_i[v_i < 0.] = -1.
+            v_i[v_i >= 0.] = 1.
+
+        hv = torch.autograd.grad(
+            grad,
+            p,
+            grad_outputs=v,
+            only_inputs=True,
+            retain_graph=True)
+
+        param_size = hv.size()
+        if len(param_size) <= 2:  # for 0/1/2D tensor
+            # Hessian diagonal block size is 1 here.
+            # We use that torch.abs(hv * vi) = hv.abs()
+            return hv.abs()
+
+        elif len(param_size) == 4:  # Conv kernel
+            # Hessian diagonal block size is 9 here: torch.sum() reduces the dim 2/3.
+            # We use that torch.abs(hv * vi) = hv.abs()
+            return torch.mean(hv.abs(), dim=[2, 3], keepdim=True)
+
     def step(self, lr=None, half=False):
         #print("==================================")
         if self.paramProb is None:
@@ -55,8 +95,10 @@ class SGHMC(Optimizer):
         for i, (group, mGroup) in enumerate(zip(self.param_groups, self.mGroups)):
             if lr:
                 group["lr"] = lr
-            dist = 0
             for j, (p, mp) in enumerate(zip(group["params"], mGroup)):
+                if self.MH and group["quantize"][j]:
+                    hessian = torch.norm(self.get_trace(p, p.grad)) ** 2
+
                 d_p = p.grad.data + p / (self.priorSigma ** 2)
 
                 temp2 = p
@@ -64,30 +106,40 @@ class SGHMC(Optimizer):
                 mp.data.add_(d_p, alpha=(- group["lr"]) / self.annealing)
                 temp = mp / (1 + self.mDecay)
 
-                eps = torch.randn(p.size()).cuda()
-                noise = (
-                    group["lr"] * self.temperature * self.mDecay
-                ) ** 0.5 * 2 * eps
-                mp.data.add_(noise)
+                if self.noise:
+                    eps = torch.randn(p.size()).cuda()
+                    noise = (
+                        group["lr"] * self.temperature * self.mDecay
+                    ) ** 0.5 * 2 * eps
+                    mp.data.add_(noise)
+
                 mp /= 1 + self.mDecay
                 p.data.add_(mp, alpha=(0.5 if half else 1) * group["lr"])
 
-                if(self.MH):
+                # calculate M-H transition probability
+                if self.MH and group["quantize"][j]:
                     dist1 = torch.norm(temp2 + group["lr"] * temp * (0.5 if half else 1) - p)**2 #q(θ_t+1|θ_t)
                     if(self.lastP[i][j] is not None):
-                        dist2 = torch.norm(temp2 + group["lr"] * temp * self.lastM - self.lastP[i][j])**2 #q(θ_t|θ_t+1)
+                        dist2 = torch.norm(temp2 + group["lr"] * temp * self.lastM - self.lastP[i][j])**2 #q(θ_t-1|θ_t)
                     else:
                         dist2 = torch.zeros(1)
                     self.lastP[i][j] = temp2
                     self.lastM = 0.5 if half else 1
-                    dist += (dist2.item() - dist1.item())
-            if(self.MH and (self.temperature > 0)):
-                self.paramProb += dist / (4 * group["lr"] * self.temperature * self.mDecay)
+                    dist = (dist1.item() - dist2.item())
+
+                    beta_w = temp2.mean((1,2,3)).view(-1,1,1,1)
+                    alpha_w = torch.sqrt(((temp2-beta_w)**2).sum((1,2,3))/self.filter_size).view(-1,1,1,1)
+                    alpha = torch.norm(alpha_w) ** 2
+                    self.paramProb += dist / (8 * group["lr"] ** 2 * alpha * hessian)
 
     def getParamProb(self):
         for i, (group, mGroup) in enumerate(zip(self.param_groups, self.mGroups)):
-            dist = 0
             for j, (p, mp) in enumerate(zip(group["params"], mGroup)):
+                if not group["quantize"][j]:
+                    continue
+
+                hessian = torch.norm(self.get_trace(p, p.grad)) ** 2
+
                 temp = p.grad.data + p / (self.priorSigma ** 2)
 
                 temp = ((1 - self.mDecay) * mp - temp * group["lr"]) / (1 + self.mDecay)
@@ -97,9 +149,12 @@ class SGHMC(Optimizer):
                     dist2 = torch.zeros(1)
                 self.lastP[i][j] = None
                 self.lastM = 1
-                dist += (dist2.item())
-            if(self.MH and (self.temperature > 0)):
-                self.paramProb += dist / (4 * group["lr"] * self.temperature * self.mDecay)
+
+                beta_w = p.mean((1,2,3)).view(-1,1,1,1)
+                alpha_w = torch.sqrt(((p-beta_w)**2).sum((1,2,3))/self.filter_size).view(-1,1,1,1)
+                alpha = torch.norm(alpha_w) ** 2
+                self.paramProb -= dist2.item() / (8 * group["lr"] ** 2 * alpha * hessian)
+
         temp = self.paramProb
         self.paramProb = 0
         return temp

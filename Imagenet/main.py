@@ -83,6 +83,7 @@ parser.add_argument('-e', '--evaluate', dest='evaluate', action='store_true',
 parser.add_argument('--sampleNumber', default=10, type=int, help='sample number for ensemble')
 parser.add_argument('--sampleInterval', default=1, type=int, help='epochs between two samples')
 parser.add_argument('--deepEnsemble', default=1, type=int, help='rerun the training')
+parser.add_argument('--ece', action='store_true', help='evaluation of ece')
 parser.add_argument('--ecebins', default=15, type=int, help='numbers of ECE bins')
 
 #Metropolist-Hastings
@@ -182,9 +183,9 @@ def Log_UP(epoch, total_epochs):
 def Metropolis_Hastings(Ocur, Onext, Mcur, Mnext):
     accept = False
     Onext.dataProb = 0
-    paramProb = 5000000
+    paramProb = -5000000
     if Ocur.paramProb is None:
-        Ocur.paramProb = 5000000
+        Ocur.paramProb = -5000000
     else:
         paramProb = Onext.getParamProb()
     total = 0
@@ -192,11 +193,11 @@ def Metropolis_Hastings(Ocur, Onext, Mcur, Mnext):
 
     ell = None
     priorTerm = (Onext.getPrior() - Ocur.getPrior()) / (2 * args.priorSigma ** 2) / Onext.annealing
-    mu_0 = (math.log(randomValue) + paramProb + priorTerm) / datasize
+    mu_0 = (math.log(randomValue) - paramProb + priorTerm) / datasize
     if(args.debug_show_prob):
-        #print("log_paramProb:", paramProb / datasize)
+        #print("log_paramProb:", -paramProb / datasize)
         #print("mu_0:", mu_0)
-        print("q term:\t", math.exp(-paramProb))
+        print("q term:\t", math.exp(paramProb))
         print("prior term:\t", math.exp(-priorTerm))
     with torch.no_grad():
         for (data, target) in MHloader:
@@ -226,7 +227,7 @@ def Metropolis_Hastings(Ocur, Onext, Mcur, Mnext):
                     if(args.debug_show_prob):
                         #print(delta)
                         print("p term:\t", torch.exp(datasize * ell.mean()).item())
-                        print("accept rate:\t", math.exp(-paramProb - priorTerm) * torch.exp(datasize * ell.mean()).item())
+                        print("accept rate:\t", math.exp(paramProb - priorTerm) * torch.exp(datasize * ell.mean()).item())
                     return (ell.mean().item() > mu_0)
     Onext.dataProb = Onext.dataProb.item() / total
     if(Onext.dataProb > mu_0):
@@ -234,7 +235,7 @@ def Metropolis_Hastings(Ocur, Onext, Mcur, Mnext):
     return accept
 
 
-def train(start_epoch, best_prec, model, train_loader, test_loader, optimizer, lr_scheduler, args, cuda_device):
+def train(start_epoch, best_prec, model, train_loader, test_loader, optimizer, lr_scheduler, args):
     i = 0
     val_accuracy = 0
     criterion = nn.CrossEntropyLoss().cuda()
@@ -261,6 +262,11 @@ def train(start_epoch, best_prec, model, train_loader, test_loader, optimizer, l
         priorSigma=args.priorSigma,
         lr=args.lr
     )
+    for name, _ in bestModel.named_parameters():
+        if "layer" in name and "conv" in name and "weight" in name:
+            bestOpt.param_groups[0]["quantize"].append(True)
+        else:
+            bestOpt.param_groups[0]["quantize"].append(False)
     if(args.LoadPath != ''):
         checkpoint = torch.load(os.path.join(args.LoadPath, "checkpoint.pth"))
         bestModel.load_state_dict(checkpoint['state_dict'])
@@ -307,7 +313,7 @@ def train(start_epoch, best_prec, model, train_loader, test_loader, optimizer, l
         bestOpt.t = t
         bestOpt.k = k
 
-        with tqdm.tqdm(enumerate(trainloader), total=len(trainloader)) as t:
+        with tqdm.tqdm(enumerate(train_loader), total=len(train_loader)) as t:
             t.set_description(f"Epoch {epoch} train")
             for batch_idx, (data, target) in t:
                 i += 1
@@ -356,14 +362,15 @@ def train(start_epoch, best_prec, model, train_loader, test_loader, optimizer, l
 
                 #calculate ECE
 
-                predVal = torch.gather(F.softmax(output, dim=1), 1, target.view(-1, 1))
                 ece = 0
-                for ecei in range(args.ecebins):
-                    predPos = (predVal >= eceBin[ecei]) * (predVal < eceBin[ecei + 1])
-                    eceTotal[ecei] += predPos.sum().item()
-                    ecePred[ecei] += (predVal * predPos).sum().item()
-                    eceAcc[ecei] += (prediction.eq(target.data).view(-1, 1) * predPos).sum().item()
-                    ece += abs(ecePred[ecei] - eceAcc[ecei])
+                if args.ece:
+                    predVal = torch.gather(F.softmax(output, dim=1), 1, target.view(-1, 1))
+                    for ecei in range(args.ecebins):
+                        predPos = (predVal >= eceBin[ecei]) * (predVal < eceBin[ecei + 1])
+                        eceTotal[ecei] += predPos.sum().item()
+                        ecePred[ecei] += (predVal * predPos).sum().item()
+                        eceAcc[ecei] += (prediction.eq(target.data).view(-1, 1) * predPos).sum().item()
+                        ece += abs(ecePred[ecei] - eceAcc[ecei])
 
                 t.set_postfix(
                     {
@@ -454,20 +461,20 @@ def evaluate(model, test_loader, epoch):
             t5pred = torch.topk(output.data, k=5, dim=1, largest=True)[1]
 
             #calculate ECE
-
-            predVal = torch.gather(F.softmax(output, dim=1), 1, target.view(-1, 1))
-            for ecei in range(args.ecebins):
-                predPos = (predVal >= eceBin[ecei]) * (predVal < eceBin[ecei + 1])
-                eceTotal[ecei] += predPos.sum().item()
-                ecePred[ecei] += (predVal * predPos).sum().item()
-                eceAcc[ecei] += (prediction.eq(target.data).view(-1, 1) * predPos).sum().item()
-                ece += abs(ecePred[ecei] - eceAcc[ecei])
+            if args.ece:
+                predVal = torch.gather(F.softmax(output, dim=1), 1, target.view(-1, 1))
+                for ecei in range(args.ecebins):
+                    predPos = (predVal >= eceBin[ecei]) * (predVal < eceBin[ecei + 1])
+                    eceTotal[ecei] += predPos.sum().item()
+                    ecePred[ecei] += (predVal * predPos).sum().item()
+                    eceAcc[ecei] += (prediction.eq(target.data).view(-1, 1) * predPos).sum().item()
+                    ece += abs(ecePred[ecei] - eceAcc[ecei])
 
             val_acc += prediction.eq(target.data).sum().item()
             t5acc += t5pred.eq(target.view(-1, 1).data).sum().item()
             outputs.append(output)
 
-    if epoch == args.end_epoch - 1:
+    if args.ece and epoch == args.end_epoch - 1:
         for ecei in range(args.ecebins):
             if eceTotal[ecei] > 0:
                 line = "ECE bin [{:.3f}, {:.3f}], pred / acc / total: {:.3f} / {:.3f} / {}".format(eceBin[ecei], eceBin[ecei + 1], ecePred[ecei] / eceTotal[ecei],
@@ -502,6 +509,11 @@ for _ in range(args.deepEnsemble):
         priorSigma=args.priorSigma,
         lr=args.lr
     )
+    for name, _ in model.named_parameters():
+        if "layer" in name and "conv" in name and "weight" in name:
+            optimizer.param_groups[0]["quantize"].append(True)
+        else:
+            optimizer.param_groups[0]["quantize"].append(False)
     start_epoch = args.start_epoch
     best_prec = 0
     if(args.LoadPath != ''):
@@ -530,7 +542,7 @@ for _ in range(args.deepEnsemble):
         lr_scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, args.epochs, eta_min = 0, last_epoch=-1)
     for epoch in range(args.start_epoch):
         lr_scheduler.step()
-    train_loss, train_acc, test_loss, test_acc, sample = train(start_epoch, best_prec, model, trainloader, testloader, optimizer, lr_scheduler, args, cuda_device)
+    train_loss, train_acc, test_loss, test_acc, sample = train(start_epoch, best_prec, model, trainloader, testloader, optimizer, lr_scheduler, args)
     samples += sample
 
 eceBin = [i * 1.0001 / args.ecebins for i in range(args.ecebins + 1)]
@@ -573,13 +585,14 @@ with tqdm.tqdm(enumerate(testloader), total=len(testloader)) as t:
 
             #calculate ECE
 
-            predVal = torch.gather(output, 1, target.view(-1, 1))
-            for ecei in range(0, args.ecebins):
-                predPos = (predVal >= eceBin[ecei]) * (predVal < eceBin[ecei + 1])
-                eceTotal[ecei] += predPos.sum().item()
-                ecePred[ecei] += (predVal * predPos).sum().item()
-                eceAcc[ecei] += (prediction.eq(target.data).view(-1, 1) * predPos).sum().item()
-                ece += abs(ecePred[ecei] - eceAcc[ecei])
+            if args.ece:
+                predVal = torch.gather(output, 1, target.view(-1, 1))
+                for ecei in range(0, args.ecebins):
+                    predPos = (predVal >= eceBin[ecei]) * (predVal < eceBin[ecei + 1])
+                    eceTotal[ecei] += predPos.sum().item()
+                    ecePred[ecei] += (predVal * predPos).sum().item()
+                    eceAcc[ecei] += (prediction.eq(target.data).view(-1, 1) * predPos).sum().item()
+                    ece += abs(ecePred[ecei] - eceAcc[ecei])
 
             t.set_postfix(
                 {
@@ -593,15 +606,16 @@ with tqdm.tqdm(enumerate(testloader), total=len(testloader)) as t:
     print(line)
     log.write(line + "\n")
     log.flush()
-    for ecei in range(args.ecebins):
-        if eceTotal[ecei] > 0:
-            line = "ECE bin [{:.3f}, {:.3f}], pred / acc / total: {:.3f} / {:.3f} / {}".format(eceBin[ecei], eceBin[ecei + 1], ecePred[ecei] / eceTotal[ecei],
-                                                                                        eceAcc[ecei] / eceTotal[ecei], eceTotal[ecei])
-        else:
-            line = "ECE bin [{:.3f}, {:.3f}], pred / acc / total: 0 / 0 / 0".format(eceBin[ecei], eceBin[ecei + 1])
-        print(line)
-        log.write(line + "\n")
-        log.flush()
+    if args.ece:
+        for ecei in range(args.ecebins):
+            if eceTotal[ecei] > 0:
+                line = "ECE bin [{:.3f}, {:.3f}], pred / acc / total: {:.3f} / {:.3f} / {}".format(eceBin[ecei], eceBin[ecei + 1], ecePred[ecei] / eceTotal[ecei],
+                                                                                            eceAcc[ecei] / eceTotal[ecei], eceTotal[ecei])
+            else:
+                line = "ECE bin [{:.3f}, {:.3f}], pred / acc / total: 0 / 0 / 0".format(eceBin[ecei], eceBin[ecei + 1])
+            print(line)
+            log.write(line + "\n")
+            log.flush()
 
 line = "Total time: {}s".format(time.time() - start_time)
 print(line)
