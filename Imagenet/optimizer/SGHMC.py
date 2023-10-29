@@ -90,7 +90,7 @@ class SGHMC(Optimizer):
             # We use that torch.abs(hv * vi) = hv.abs()
             return torch.mean(hv.abs(), dim=[2, 3], keepdim=True)
 
-    def step(self, lr=None, half=False):
+    def step(self, lr=None, half=False, MH_rejected=False):
         #print("==================================")
         if self.paramProb is None:
             self.paramProb = 0
@@ -99,9 +99,8 @@ class SGHMC(Optimizer):
                 group["lr"] = lr
             for j, (p, mp) in enumerate(zip(group["params"], mGroup)):
                 if self.MH and self.quantizeList[j]:
-                    if self.save_hessian is not None:
+                    if MH_rejected and self.save_hessian is not None:
                         hessian = self.save_hessian
-                        self.save_hessian = None
                     else:
                         hessian = torch.norm(self.get_trace(p, p.grad)).item() ** 2
 

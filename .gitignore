@@ -6,3 +6,6 @@
 
 # test file
 test.py
+
+# cache
+__pycache__

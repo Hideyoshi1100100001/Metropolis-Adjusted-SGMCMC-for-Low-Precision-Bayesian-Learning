@@ -381,3 +381,38 @@ Epoch: 59	Time: 3401.3s	Train Loss: 2.292	Train Acc: 50.373%	Train ECE: 0.000
 Val Loss: 2.013	Val Acc: 54.722	Val top5 Acc: 77.836	Val ECE: 0.000	Best Acc: 55.410
 Sample test: loss: 0.512, acc: 59.510%, top5 acc: 81.166%, ece: 0.000
 Total time: 82305.64807224274s
+data:	../../../LargeData/Large/ImageNet
+workers:	32
+gpu_id:	0,1,2,3,4,5,6
+fp:	False
+epochs:	120
+start_epoch:	0
+end_epoch:	120
+batch_size:	128
+MH_batch_size:	128
+lr:	0.1
+temperature:	0
+annealing:	1
+momentumDecay:	0.1
+priorSigma:	100.0
+quantizeDecay:	0
+transitionKernel:	[1, 1]
+flipPossibility:	0.05
+fixed_lr:	False
+LoadPath:	./checkpoints/SGHMC60
+SavePath:	./checkpoints/MH120
+saveInterval:	1
+evaluate:	False
+sampleNumber:	10
+sampleInterval:	1
+deepEnsemble:	1
+ece:	False
+ecebins:	15
+MH:	True
+MHInterval:	50
+MHEpsilon:	0.2
+debug_show_prob:	False
+manualSeed:	6472
+Loading checkpoint './checkpoints/SGHMC60/checkpoint.pth'
+Loaded checkpoint './checkpoints/SGHMC60/checkpoint.pth' (epoch 60)
+Epoch: 60	LearningRate: 0.049999999999999975	StepTemperature:0

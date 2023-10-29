@@ -53,6 +53,8 @@ parser.add_argument('--end-epoch', default=0, type=int, metavar='N',
                     help='manual end epoch number')
 parser.add_argument('-b', '--batch-size', default=512, type=int,
                     metavar='N', help='mini-batch size (default: 512)')
+parser.add_argument('-mhb', '--MH-batch-size', default=512, type=int,
+                    metavar='N', help='MH-batch size (default: 512)')
 parser.add_argument('--lr', '--learning-rate', default=0.2, type=float,
                     metavar='LR', help='initial learning rate')
 parser.add_argument('--temperature', default=0, type=float, help='factor that multiplies gaussian noise')
@@ -157,7 +159,7 @@ def imageNet():
             transforms.ToTensor(),
             normalize,
         ])),
-        batch_size=args.batch_size, shuffle=True,
+        batch_size=args.MH_batch_size, shuffle=True,
         num_workers=args.workers, pin_memory=False)
 
     val_loader = torch.utils.data.DataLoader(
@@ -346,13 +348,13 @@ def train(start_epoch, best_prec, model, train_loader, test_loader, optimizer, l
                             bestOpt.load_state_dict(checkpoint['optimizer'])
                             bestModel.load_state_dict(checkpoint['state_dict'])
                         else:
-                            bestOpt.mGroups = [[-i for i in group] for group in bestOpt.mGroups]
+                            #bestOpt.mGroups = [[-i for i in group] for group in bestOpt.mGroups]
                             torch.save({'state_dict':bestModel.state_dict(),
                                        'optimizer':bestOpt.state_dict()}, os.path.join(args.SavePath, "temp.pth"))
                             checkpoint = torch.load(os.path.join(args.SavePath, "temp.pth"))
                             optimizer.load_state_dict(checkpoint['optimizer'])
                             model.load_state_dict(checkpoint['state_dict'])
-                        optimizer.step(half=False)
+                        optimizer.step(half=False, MH_rejected=(not accept))
 
                 train_loss += loss.item() * target.size(0)
                 total += target.size(0)
@@ -491,11 +493,6 @@ samples = []
 start_time = time.time()
 
 for _ in range(args.deepEnsemble):
-    if args.evaluate:
-        samples = [torch.nn.DataParallel(resnet18_1w1a(sample=True).cuda() if not args.fp else resnet18_fp(sample=True).cuda(), device_ids=gpuList) for _ in range(args.sampleNumber)]
-        for i in range(args.sampleNumber):
-            samples[i].load_state_dict(torch.load(os.path.join(args.SavePath, "sample_{:d}.pth".format(i))))
-        break
     model = resnet18_1w1a().cuda() if not args.fp else resnet18_fp().cuda()
     model = torch.nn.DataParallel(model, device_ids=gpuList)
     optimizer = torch.optim.SGD(model.parameters(), lr=args.lr)
@@ -549,6 +546,11 @@ eceTotal = [0 for _ in range(args.ecebins)]
 ecePred = [0 for _ in range(args.ecebins)]
 eceAcc = [0 for _ in range(args.ecebins)]
 ece = 0
+
+
+samples = [torch.nn.DataParallel(resnet18_1w1a(sample=True).cuda() if not args.fp else resnet18_fp(sample=True).cuda(), device_ids=gpuList) for _ in range(args.sampleNumber)]
+for i in range(args.sampleNumber):
+    samples[i].load_state_dict(torch.load(os.path.join(args.SavePath, "sample_{:d}.pth".format(i))))
 
 #_, _ = evaluate(samples[0], testloader)
 with tqdm.tqdm(enumerate(testloader), total=len(testloader)) as t:
