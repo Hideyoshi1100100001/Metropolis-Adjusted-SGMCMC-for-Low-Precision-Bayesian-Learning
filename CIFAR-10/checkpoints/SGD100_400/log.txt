@@ -1,0 +1,31 @@
+workers:	32
+gpu_id:	0
+fp:	False
+epochs:	400
+start_epoch:	0
+end_epoch:	100
+batch_size:	100
+MH_batch_size:	100
+lr:	0.1
+temperature:	0
+annealing:	1
+momentumDecay:	0.1
+priorSigma:	100.0
+quantizeDecay:	0
+transitionKernel:	[1, 1]
+flipPossibility:	0.05
+fixed_lr:	False
+LoadPath:	
+SavePath:	./checkpoints/SGD100_400
+saveInterval:	1
+evaluate:	False
+sampleNumber:	10
+sampleInterval:	1
+deepEnsemble:	1
+ece:	False
+ecebins:	15
+MH:	False
+MHInterval:	10
+MHEpsilon:	0.2
+debug_show_prob:	False
+manualSeed:	4355
