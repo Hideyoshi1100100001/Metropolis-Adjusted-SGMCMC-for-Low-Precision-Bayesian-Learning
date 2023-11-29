@@ -28,4 +28,11 @@ MH:	False
 MHInterval:	10
 MHEpsilon:	0.2
 debug_show_prob:	False
-manualSeed:	4355
+manualSeed:	1561
+Epoch: 0	LearningRate: 0.1	StepTemperature:0
+Epoch: 0	Time: 68.6s	Train Loss: 1.762	Train Acc: 34.886%	Train ECE: 0.000
+Val Loss: 1.550	Val Acc: 43.340	Val top5 Acc: 91.130	Val ECE: 0.000	Best Acc: 43.340
+Epoch: 1	LearningRate: 0.09999845788223949	StepTemperature:0
+Epoch: 1	Time: 68.6s	Train Loss: 1.513	Train Acc: 44.396%	Train ECE: 0.000
+Val Loss: 1.426	Val Acc: 47.980	Val top5 Acc: 93.410	Val ECE: 0.000	Best Acc: 47.980
+Epoch: 2	LearningRate: 0.09999383162408303	StepTemperature:0

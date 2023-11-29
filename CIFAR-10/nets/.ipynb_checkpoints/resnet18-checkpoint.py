@@ -47,7 +47,7 @@ class BasicBlock(nn.Module):
 
 class ResNet(nn.Module):
 
-    def __init__(self, sample, block, layers, num_classes=1000, deep_stem=False,
+    def __init__(self, sample, block, layers, num_classes=10, deep_stem=False,
                  avg_down=True, bypass_last_bn=False,
                  bn_group_size=1,
                  bn_group=None,
@@ -78,17 +78,15 @@ class ResNet(nn.Module):
                         nn.Conv2d(32, 64, kernel_size=3, stride=1, padding=1, bias=False),
                     )
         else:
-            self.conv1 = nn.Conv2d(3, 64, kernel_size=7, stride=2, padding=3, bias=False)
+            self.conv1 = nn.Conv2d(3, 64, kernel_size=3, stride=1, padding=1, bias=False)
         self.bn1 = nn.BatchNorm2d(64)
         self.nonlinear1 = Maxout(64)
-        self.maxpool = nn.MaxPool2d(kernel_size=3, stride=2, padding=1)
 
-        self.layer1 = self._make_layer(block, 64, layers[0])
+        self.layer1 = self._make_layer(block, 64, layers[0], stride=1)
         self.layer2 = self._make_layer(block, 128, layers[1], stride=2)
         self.layer3 = self._make_layer(block, 256, layers[2], stride=2)
         self.layer4 = self._make_layer(block, 512, layers[3], stride=2)
 
-        self.avgpool = nn.AvgPool2d(7, stride=1)
         self.bn2 = nn.BatchNorm1d(512 * block.expansion)
         self.nonlinear2 = Maxout(512 * block.expansion)
 
@@ -132,24 +130,22 @@ class ResNet(nn.Module):
         layers.append(block(self.inplanes, planes, stride, downsample))
         self.inplanes = planes * block.expansion
         for i in range(1, blocks):
-            layers.append(block(self.inplanes, planes))
+            layers.append(block(self.inplanes, planes, 1))
 
         return nn.Sequential(*layers)
 
     def forward(self, x):
         x = self.nonlinear1(self.bn1(self.conv1(x)))
 
-        x = self.maxpool(x)     
-
         x = self.layer1(x)
         x = self.layer2(x)
-        
+
         x = self.layer3(x)
         x = self.layer4(x)
 
-        x = self.avgpool(x)
+        x = F.avg_pool2d(x, 4)
         x = x.view(x.size(0), -1)
-        x = self.bn2(x)      
+        x = self.bn2(x)
         x = self.fc(x)
         if self.sample:
             return F.softmax(x, dim=1) * self.predWeight
