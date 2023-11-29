@@ -382,7 +382,7 @@ Val Loss: 2.013	Val Acc: 54.722	Val top5 Acc: 77.836	Val ECE: 0.000	Best Acc: 55
 Sample test: loss: 0.512, acc: 59.510%, top5 acc: 81.166%, ece: 0.000
 Total time: 82305.64807224274s
 data:	../../../LargeData/Large/ImageNet
-workers:	16
+workers:	20
 gpu_id:	0,1,2,3,4,5,6
 fp:	False
 epochs:	120
@@ -400,7 +400,7 @@ transitionKernel:	[1, 1]
 flipPossibility:	0.05
 fixed_lr:	False
 LoadPath:	./checkpoints/SGHMC60
-SavePath:	./checkpoints/MH120
+SavePath:	./checkpoints/SGHMC120
 saveInterval:	1
 evaluate:	False
 sampleNumber:	10
@@ -408,190 +408,229 @@ sampleInterval:	1
 deepEnsemble:	1
 ece:	False
 ecebins:	15
-MH:	True
+MH:	False
 MHInterval:	50
 MHEpsilon:	0.2
 debug_show_prob:	False
-manualSeed:	2298
+manualSeed:	3301
 Loading checkpoint './checkpoints/SGHMC60/checkpoint.pth'
 Loaded checkpoint './checkpoints/SGHMC60/checkpoint.pth' (epoch 60)
 Epoch: 60	LearningRate: 0.049999999999999975	StepTemperature:0
-Epoch: 60	Time: 65544.7s	Train Loss: 2.269	 Train Acc: 50.712%	Train ECE: 0.000
-Val Loss: 2.002	Val Acc: 54.778	Val top5 Acc: 78.034	Val ECE: 0.000	Best Acc: 55.410	MH Accept Rate: 0.460
+Epoch: 60	Time: 6282.6s	Train Loss: 2.283	Train Acc: 50.475%	Train ECE: 0.000
+Val Loss: 2.017	Val Acc: 54.310	Val top5 Acc: 77.820	Val ECE: 0.000	Best Acc: 55.410
 Epoch: 61	LearningRate: 0.048691152584606316	StepTemperature:0
-Epoch: 61	Time: 65708.3s	Train Loss: 2.261	 Train Acc: 50.912%	Train ECE: 0.000
-Val Loss: 2.007	Val Acc: 54.850	Val top5 Acc: 78.084	Val ECE: 0.000	Best Acc: 55.410	MH Accept Rate: 0.425
+Epoch: 61	Time: 3344.3s	Train Loss: 2.272	Train Acc: 50.734%	Train ECE: 0.000
+Val Loss: 2.026	Val Acc: 54.738	Val top5 Acc: 77.778	Val ECE: 0.000	Best Acc: 55.410
 Epoch: 62	LearningRate: 0.04738320218785279	StepTemperature:0
-Epoch: 62	Time: 66002.1s	Train Loss: 2.255	 Train Acc: 51.034%	Train ECE: 0.000
-Val Loss: 1.916	Val Acc: 56.364	Val top5 Acc: 79.566	Val ECE: 0.000	Best Acc: 56.364	MH Accept Rate: 0.460
+Epoch: 62	Time: 3351.0s	Train Loss: 2.264	Train Acc: 50.826%	Train ECE: 0.000
+Val Loss: 1.923	Val Acc: 56.142	Val top5 Acc: 79.226	Val ECE: 0.000	Best Acc: 56.142
 Epoch: 63	LearningRate: 0.04607704521360773	StepTemperature:0
-Epoch: 63	Time: 66304.4s	Train Loss: 2.248	 Train Acc: 51.155%	Train ECE: 0.000
-Val Loss: 1.917	Val Acc: 56.404	Val top5 Acc: 79.210	Val ECE: 0.000	Best Acc: 56.404	MH Accept Rate: 0.600
+Epoch: 63	Time: 3376.0s	Train Loss: 2.255	Train Acc: 50.989%	Train ECE: 0.000
+Val Loss: 1.937	Val Acc: 56.210	Val top5 Acc: 78.942	Val ECE: 0.000	Best Acc: 56.210
 Epoch: 64	LearningRate: 0.044773576836617306	StepTemperature:0
-Epoch: 64	Time: 66269.1s	Train Loss: 2.238	 Train Acc: 51.339%	Train ECE: 0.000
-Val Loss: 1.958	Val Acc: 55.610	Val top5 Acc: 78.592	Val ECE: 0.000	Best Acc: 56.404	MH Accept Rate: 0.490
+Epoch: 64	Time: 3350.8s	Train Loss: 2.241	Train Acc: 51.279%	Train ECE: 0.000
+Val Loss: 1.891	Val Acc: 56.946	Val top5 Acc: 79.782	Val ECE: 0.000	Best Acc: 56.946
 Epoch: 65	LearningRate: 0.043473690388997406	StepTemperature:0
-Epoch: 65	Time: 66159.3s	Train Loss: 2.229	 Train Acc: 51.521%	Train ECE: 0.000
-Val Loss: 1.912	Val Acc: 56.600	Val top5 Acc: 79.462	Val ECE: 0.000	Best Acc: 56.600	MH Accept Rate: 0.445
+Epoch: 65	Time: 3390.9s	Train Loss: 2.233	Train Acc: 51.403%	Train ECE: 0.000
+Val Loss: 2.017	Val Acc: 54.990	Val top5 Acc: 77.966	Val ECE: 0.000	Best Acc: 56.946
 Epoch: 66	LearningRate: 0.04217827674798843	StepTemperature:0
-Epoch: 66	Time: 65722.2s	Train Loss: 2.220	 Train Acc: 51.656%	Train ECE: 0.000
-Val Loss: 1.892	Val Acc: 56.874	Val top5 Acc: 79.666	Val ECE: 0.000	Best Acc: 56.874	MH Accept Rate: 0.440
+Epoch: 66	Time: 3379.0s	Train Loss: 2.228	Train Acc: 51.505%	Train ECE: 0.000
+Val Loss: 1.884	Val Acc: 57.114	Val top5 Acc: 79.802	Val ECE: 0.000	Best Acc: 57.114
 Epoch: 67	LearningRate: 0.04088822372539261	StepTemperature:0
-Epoch: 67	Time: 66373.7s	Train Loss: 2.213	 Train Acc: 51.774%	Train ECE: 0.000
-Val Loss: 1.892	Val Acc: 56.906	Val top5 Acc: 79.632	Val ECE: 0.000	Best Acc: 56.906	MH Accept Rate: 0.510
+data:	../../../LargeData/Large/ImageNet
+workers:	20
+gpu_id:	0,1,2,3,4,5,6
+fp:	False
+epochs:	120
+start_epoch:	0
+end_epoch:	120
+batch_size:	128
+MH_batch_size:	128
+lr:	0.1
+temperature:	0
+annealing:	1
+momentumDecay:	0.1
+priorSigma:	100.0
+quantizeDecay:	0
+transitionKernel:	[1, 1]
+flipPossibility:	0.05
+fixed_lr:	False
+LoadPath:	./checkpoints/SGHMC120
+SavePath:	./checkpoints/SGHMC120
+saveInterval:	1
+evaluate:	False
+sampleNumber:	10
+sampleInterval:	1
+deepEnsemble:	1
+ece:	False
+ecebins:	15
+MH:	False
+MHInterval:	50
+MHEpsilon:	0.2
+debug_show_prob:	False
+manualSeed:	9423
+Loading checkpoint './checkpoints/SGHMC120/checkpoint.pth'
+Loaded checkpoint './checkpoints/SGHMC120/checkpoint.pth' (epoch 67)
+Epoch: 67	LearningRate: 0.04088822372539261	StepTemperature:0
+Epoch: 67	Time: 3365.2s	Train Loss: 2.219	Train Acc: 51.710%	Train ECE: 0.000
+Val Loss: 1.893	Val Acc: 56.858	Val top5 Acc: 79.682	Val ECE: 0.000	Best Acc: 57.114
 Epoch: 68	LearningRate: 0.039604415459112	StepTemperature:0
-Epoch: 68	Time: 66290.5s	Train Loss: 2.206	 Train Acc: 51.921%	Train ECE: 0.000
-Val Loss: 1.922	Val Acc: 56.650	Val top5 Acc: 79.402	Val ECE: 0.000	Best Acc: 56.906	MH Accept Rate: 0.555
+Epoch: 68	Time: 3372.2s	Train Loss: 2.211	Train Acc: 51.840%	Train ECE: 0.000
+Val Loss: 1.915	Val Acc: 56.398	Val top5 Acc: 79.404	Val ECE: 0.000	Best Acc: 57.114
 Epoch: 69	LearningRate: 0.0383277318072047	StepTemperature:0
-Epoch: 69	Time: 66147.1s	Train Loss: 2.198	 Train Acc: 52.044%	Train ECE: 0.000
-Val Loss: 1.883	Val Acc: 57.140	Val top5 Acc: 79.932	Val ECE: 0.000	Best Acc: 57.140	MH Accept Rate: 0.495
+Epoch: 69	Time: 3415.7s	Train Loss: 2.201	Train Acc: 51.987%	Train ECE: 0.000
+Val Loss: 1.862	Val Acc: 57.552	Val top5 Acc: 80.120	Val ECE: 0.000	Best Acc: 57.552
 Epoch: 70	LearningRate: 0.03705904774487394	StepTemperature:0
-Epoch: 70	Time: 66620.1s	Train Loss: 2.193	 Train Acc: 52.201%	Train ECE: 0.000
-Val Loss: 1.859	Val Acc: 57.354	Val top5 Acc: 80.148	Val ECE: 0.000	Best Acc: 57.354	MH Accept Rate: 0.540
+Epoch: 70	Time: 3370.1s	Train Loss: 2.192	Train Acc: 52.165%	Train ECE: 0.000
+Val Loss: 1.860	Val Acc: 57.380	Val top5 Acc: 80.118	Val ECE: 0.000	Best Acc: 57.552
 Epoch: 71	LearningRate: 0.03579923276480384	StepTemperature:0
-Epoch: 71	Time: 66063.5s	Train Loss: 2.181	 Train Acc: 52.400%	Train ECE: 0.000
-Val Loss: 1.862	Val Acc: 57.358	Val top5 Acc: 80.068	Val ECE: 0.000	Best Acc: 57.358	MH Accept Rate: 0.515
+Epoch: 71	Time: 3393.2s	Train Loss: 2.185	Train Acc: 52.351%	Train ECE: 0.000
+Val Loss: 1.862	Val Acc: 57.656	Val top5 Acc: 80.170	Val ECE: 0.000	Best Acc: 57.656
 Epoch: 72	LearningRate: 0.034549150281252605	StepTemperature:0
-Epoch: 72	Time: 66117.3s	Train Loss: 2.170	 Train Acc: 52.603%	Train ECE: 0.000
-Val Loss: 1.863	Val Acc: 57.500	Val top5 Acc: 80.196	Val ECE: 0.000	Best Acc: 57.500	MH Accept Rate: 0.490
+Epoch: 72	Time: 3382.8s	Train Loss: 2.177	Train Acc: 52.490%	Train ECE: 0.000
+Val Loss: 1.873	Val Acc: 57.390	Val top5 Acc: 79.904	Val ECE: 0.000	Best Acc: 57.656
 Epoch: 73	LearningRate: 0.03330965703831143	StepTemperature:0
-data:	../../../LargeData/Large/ImageNet
-workers:	16
-gpu_id:	0,1,2,3,4,5,6
-fp:	False
-epochs:	120
-start_epoch:	0
-end_epoch:	120
-batch_size:	128
-MH_batch_size:	128
-lr:	0.1
-temperature:	0
-annealing:	1
-momentumDecay:	0.1
-priorSigma:	100.0
-quantizeDecay:	0
-transitionKernel:	[1, 1]
-flipPossibility:	0.05
-fixed_lr:	False
-LoadPath:	./checkpoints/MH120
-SavePath:	./checkpoints/MH120
-saveInterval:	1
-evaluate:	False
-sampleNumber:	10
-sampleInterval:	1
-deepEnsemble:	1
-ece:	False
-ecebins:	15
-MH:	True
-MHInterval:	50
-MHEpsilon:	0.2
-debug_show_prob:	False
-manualSeed:	1092
-Loading checkpoint './checkpoints/MH120/checkpoint.pth'
-Loaded checkpoint './checkpoints/MH120/checkpoint.pth' (epoch 73)
-Epoch: 73	LearningRate: 0.03330965703831143	StepTemperature:0
-data:	../../../LargeData/Large/ImageNet
-workers:	16
-gpu_id:	0,1,2,3,4,5,6
-fp:	False
-epochs:	120
-start_epoch:	0
-end_epoch:	120
-batch_size:	128
-MH_batch_size:	128
-lr:	0.1
-temperature:	0
-annealing:	1
-momentumDecay:	0.1
-priorSigma:	100.0
-quantizeDecay:	0
-transitionKernel:	[1, 1]
-flipPossibility:	0.05
-fixed_lr:	False
-LoadPath:	./checkpoints/MH120
-SavePath:	./checkpoints/MH120
-saveInterval:	1
-evaluate:	False
-sampleNumber:	10
-sampleInterval:	1
-deepEnsemble:	1
-ece:	False
-ecebins:	15
-MH:	True
-MHInterval:	50
-MHEpsilon:	0.2
-debug_show_prob:	False
-manualSeed:	5347
-Loading checkpoint './checkpoints/MH120/checkpoint.pth'
-Loaded checkpoint './checkpoints/MH120/checkpoint.pth' (epoch 73)
-Epoch: 73	LearningRate: 0.03330965703831143	StepTemperature:0
-data:	../../../LargeData/Large/ImageNet
-workers:	16
-gpu_id:	0,1,2,3,4,5,6
-fp:	False
-epochs:	120
-start_epoch:	0
-end_epoch:	120
-batch_size:	128
-MH_batch_size:	128
-lr:	0.1
-temperature:	0
-annealing:	1
-momentumDecay:	0.1
-priorSigma:	100.0
-quantizeDecay:	0
-transitionKernel:	[1, 1]
-flipPossibility:	0.05
-fixed_lr:	False
-LoadPath:	./checkpoints/MH120
-SavePath:	./checkpoints/MH120
-saveInterval:	1
-evaluate:	False
-sampleNumber:	10
-sampleInterval:	1
-deepEnsemble:	1
-ece:	False
-ecebins:	15
-MH:	True
-MHInterval:	50
-MHEpsilon:	0.2
-debug_show_prob:	False
-manualSeed:	70
-Loading checkpoint './checkpoints/MH120/checkpoint.pth'
-Loaded checkpoint './checkpoints/MH120/checkpoint.pth' (epoch 73)
-Epoch: 73	LearningRate: 0.03330965703831143	StepTemperature:0
-data:	../../../LargeData/Large/ImageNet
-workers:	16
-gpu_id:	0,1,2,3,4,5,6
-fp:	False
-epochs:	120
-start_epoch:	0
-end_epoch:	120
-batch_size:	128
-MH_batch_size:	128
-lr:	0.1
-temperature:	0
-annealing:	1
-momentumDecay:	0.1
-priorSigma:	100.0
-quantizeDecay:	0
-transitionKernel:	[1, 1]
-flipPossibility:	0.05
-fixed_lr:	False
-LoadPath:	./checkpoints/MH120
-SavePath:	./checkpoints/MH120
-saveInterval:	1
-evaluate:	False
-sampleNumber:	10
-sampleInterval:	1
-deepEnsemble:	1
-ece:	False
-ecebins:	15
-MH:	True
-MHInterval:	50
-MHEpsilon:	0.2
-debug_show_prob:	False
-manualSeed:	21
-Loading checkpoint './checkpoints/MH120/checkpoint.pth'
-Loaded checkpoint './checkpoints/MH120/checkpoint.pth' (epoch 73)
-Epoch: 73	LearningRate: 0.03330965703831143	StepTemperature:0
+Epoch: 73	Time: 3406.5s	Train Loss: 2.166	Train Acc: 52.668%	Train ECE: 0.000
+Val Loss: 1.850	Val Acc: 57.764	Val top5 Acc: 80.334	Val ECE: 0.000	Best Acc: 57.764
+Epoch: 74	LearningRate: 0.03208160252273496	StepTemperature:0
+Epoch: 74	Time: 3406.0s	Train Loss: 2.158	Train Acc: 52.817%	Train ECE: 0.000
+Val Loss: 1.859	Val Acc: 57.166	Val top5 Acc: 80.206	Val ECE: 0.000	Best Acc: 57.764
+Epoch: 75	LearningRate: 0.030865828381745487	StepTemperature:0
+Epoch: 75	Time: 3399.8s	Train Loss: 2.149	Train Acc: 52.943%	Train ECE: 0.000
+Val Loss: 1.853	Val Acc: 57.612	Val top5 Acc: 80.374	Val ECE: 0.000	Best Acc: 57.764
+Epoch: 76	LearningRate: 0.029663167846209974	StepTemperature:0
+Epoch: 76	Time: 3410.8s	Train Loss: 2.143	Train Acc: 53.089%	Train ECE: 0.000
+Val Loss: 1.814	Val Acc: 58.426	Val top5 Acc: 80.918	Val ECE: 0.000	Best Acc: 58.426
+Epoch: 77	LearningRate: 0.02847444515958523	StepTemperature:0
+Epoch: 77	Time: 3406.0s	Train Loss: 2.133	Train Acc: 53.249%	Train ECE: 0.000
+Val Loss: 1.825	Val Acc: 58.158	Val top5 Acc: 80.784	Val ECE: 0.000	Best Acc: 58.426
+Epoch: 78	LearningRate: 0.02730047501302264	StepTemperature:0
+Epoch: 78	Time: 3382.8s	Train Loss: 2.128	Train Acc: 53.343%	Train ECE: 0.000
+Val Loss: 1.815	Val Acc: 58.284	Val top5 Acc: 80.696	Val ECE: 0.000	Best Acc: 58.426
+Epoch: 79	LearningRate: 0.026142061987019554	StepTemperature:0
+Epoch: 79	Time: 3392.3s	Train Loss: 2.120	Train Acc: 53.550%	Train ECE: 0.000
+Val Loss: 1.801	Val Acc: 58.540	Val top5 Acc: 81.104	Val ECE: 0.000	Best Acc: 58.540
+Epoch: 80	LearningRate: 0.024999999999999988	StepTemperature:0
+Epoch: 80	Time: 3409.4s	Train Loss: 2.110	Train Acc: 53.667%	Train ECE: 0.000
+Val Loss: 1.806	Val Acc: 58.532	Val top5 Acc: 81.078	Val ECE: 0.000	Best Acc: 58.540
+Epoch: 81	LearningRate: 0.023875071764202536	StepTemperature:0
+Epoch: 81	Time: 3413.0s	Train Loss: 2.105	Train Acc: 53.764%	Train ECE: 0.000
+Val Loss: 1.820	Val Acc: 58.350	Val top5 Acc: 80.786	Val ECE: 0.000	Best Acc: 58.540
+Epoch: 82	LearningRate: 0.022768048249248638	StepTemperature:0
+Epoch: 82	Time: 3398.3s	Train Loss: 2.098	Train Acc: 53.947%	Train ECE: 0.000
+Val Loss: 1.782	Val Acc: 58.718	Val top5 Acc: 81.382	Val ECE: 0.000	Best Acc: 58.718
+Epoch: 83	LearningRate: 0.021679688153758325	StepTemperature:0
+Epoch: 83	Time: 3422.2s	Train Loss: 2.093	Train Acc: 54.028%	Train ECE: 0.000
+Val Loss: 1.783	Val Acc: 58.890	Val top5 Acc: 81.290	Val ECE: 0.000	Best Acc: 58.890
+Epoch: 84	LearningRate: 0.02061073738537633	StepTemperature:0
+Epoch: 84	Time: 3403.4s	Train Loss: 2.085	Train Acc: 54.192%	Train ECE: 0.000
+Val Loss: 1.764	Val Acc: 59.336	Val top5 Acc: 81.672	Val ECE: 0.000	Best Acc: 59.336
+Epoch: 85	LearningRate: 0.01956192854956395	StepTemperature:0
+Epoch: 85	Time: 3399.6s	Train Loss: 2.074	Train Acc: 54.361%	Train ECE: 0.000
+Val Loss: 1.767	Val Acc: 59.324	Val top5 Acc: 81.506	Val ECE: 0.000	Best Acc: 59.336
+Epoch: 86	LearningRate: 0.01853398044750812	StepTemperature:0
+Epoch: 86	Time: 3384.1s	Train Loss: 2.070	Train Acc: 54.485%	Train ECE: 0.000
+Val Loss: 1.757	Val Acc: 59.536	Val top5 Acc: 81.646	Val ECE: 0.000	Best Acc: 59.536
+Epoch: 87	LearningRate: 0.017527597583490807	StepTemperature:0
+Epoch: 87	Time: 3386.0s	Train Loss: 2.063	Train Acc: 54.650%	Train ECE: 0.000
+Val Loss: 1.775	Val Acc: 59.214	Val top5 Acc: 81.478	Val ECE: 0.000	Best Acc: 59.536
+Epoch: 88	LearningRate: 0.01654346968205709	StepTemperature:0
+Epoch: 88	Time: 3406.2s	Train Loss: 2.056	Train Acc: 54.692%	Train ECE: 0.000
+Val Loss: 1.750	Val Acc: 59.630	Val top5 Acc: 81.722	Val ECE: 0.000	Best Acc: 59.630
+Epoch: 89	LearningRate: 0.015582271215312278	StepTemperature:0
+Epoch: 89	Time: 3399.5s	Train Loss: 2.051	Train Acc: 54.827%	Train ECE: 0.000
+Val Loss: 1.755	Val Acc: 59.574	Val top5 Acc: 81.710	Val ECE: 0.000	Best Acc: 59.630
+Epoch: 90	LearningRate: 0.014644660940672613	StepTemperature:0
+Epoch: 90	Time: 3433.8s	Train Loss: 2.046	Train Acc: 54.860%	Train ECE: 0.000
+Val Loss: 1.732	Val Acc: 59.946	Val top5 Acc: 82.056	Val ECE: 0.000	Best Acc: 59.946
+Epoch: 91	LearningRate: 0.013731281449385607	StepTemperature:0
+Epoch: 91	Time: 3426.9s	Train Loss: 2.045	Train Acc: 54.890%	Train ECE: 0.000
+Val Loss: 1.733	Val Acc: 60.010	Val top5 Acc: 82.022	Val ECE: 0.000	Best Acc: 60.010
+Epoch: 92	LearningRate: 0.012842758726130287	StepTemperature:0
+Epoch: 92	Time: 3413.7s	Train Loss: 2.040	Train Acc: 55.067%	Train ECE: 0.000
+Val Loss: 1.737	Val Acc: 59.782	Val top5 Acc: 81.916	Val ECE: 0.000	Best Acc: 60.010
+Epoch: 93	LearningRate: 0.011979701719998442	StepTemperature:0
+Epoch: 93	Time: 3420.0s	Train Loss: 2.038	Train Acc: 55.064%	Train ECE: 0.000
+Val Loss: 1.729	Val Acc: 60.210	Val top5 Acc: 82.014	Val ECE: 0.000	Best Acc: 60.210
+Epoch: 94	LearningRate: 0.011142701927151444	StepTemperature:0
+Epoch: 94	Time: 3358.2s	Train Loss: 2.033	Train Acc: 55.117%	Train ECE: 0.000
+Val Loss: 1.742	Val Acc: 59.800	Val top5 Acc: 81.980	Val ECE: 0.000	Best Acc: 60.210
+Epoch: 95	LearningRate: 0.010332332985438225	StepTemperature:0
+Epoch: 95	Time: 3392.9s	Train Loss: 2.030	Train Acc: 55.196%	Train ECE: 0.000
+Val Loss: 1.734	Val Acc: 59.872	Val top5 Acc: 82.104	Val ECE: 0.000	Best Acc: 60.210
+Epoch: 96	LearningRate: 0.009549150281252623	StepTemperature:0
+Epoch: 96	Time: 3390.2s	Train Loss: 2.025	Train Acc: 55.321%	Train ECE: 0.000
+Val Loss: 1.732	Val Acc: 59.950	Val top5 Acc: 82.184	Val ECE: 0.000	Best Acc: 60.210
+Epoch: 97	LearningRate: 0.008793690568899218	StepTemperature:0
+Epoch: 97	Time: 3368.0s	Train Loss: 2.025	Train Acc: 55.348%	Train ECE: 0.000
+Val Loss: 1.731	Val Acc: 59.920	Val top5 Acc: 82.222	Val ECE: 0.000	Best Acc: 60.210
+Epoch: 98	LearningRate: 0.008066471602728796	StepTemperature:0
+Epoch: 98	Time: 3420.2s	Train Loss: 2.021	Train Acc: 55.394%	Train ECE: 0.000
+Val Loss: 1.720	Val Acc: 60.190	Val top5 Acc: 82.342	Val ECE: 0.000	Best Acc: 60.210
+Epoch: 99	LearningRate: 0.007367991782295385	StepTemperature:0
+Epoch: 99	Time: 3400.3s	Train Loss: 2.020	Train Acc: 55.391%	Train ECE: 0.000
+Val Loss: 1.711	Val Acc: 60.232	Val top5 Acc: 82.318	Val ECE: 0.000	Best Acc: 60.232
+Epoch: 100	LearningRate: 0.006698729810778059	StepTemperature:0
+Epoch: 100	Time: 3430.2s	Train Loss: 2.016	Train Acc: 55.450%	Train ECE: 0.000
+Val Loss: 1.718	Val Acc: 60.186	Val top5 Acc: 82.284	Val ECE: 0.000	Best Acc: 60.232
+Epoch: 101	LearningRate: 0.006059144366901731	StepTemperature:0
+Epoch: 101	Time: 3374.9s	Train Loss: 2.013	Train Acc: 55.538%	Train ECE: 0.000
+Val Loss: 1.716	Val Acc: 60.454	Val top5 Acc: 82.302	Val ECE: 0.000	Best Acc: 60.454
+Epoch: 102	LearningRate: 0.005449673790581606	StepTemperature:0
+Epoch: 102	Time: 3391.0s	Train Loss: 2.010	Train Acc: 55.562%	Train ECE: 0.000
+Val Loss: 1.725	Val Acc: 60.042	Val top5 Acc: 82.144	Val ECE: 0.000	Best Acc: 60.454
+Epoch: 103	LearningRate: 0.004870735782506975	StepTemperature:0
+Epoch: 103	Time: 3379.0s	Train Loss: 2.007	Train Acc: 55.631%	Train ECE: 0.000
+Val Loss: 1.714	Val Acc: 60.324	Val top5 Acc: 82.244	Val ECE: 0.000	Best Acc: 60.454
+Epoch: 104	LearningRate: 0.0043227271178699475	StepTemperature:0
+Epoch: 104	Time: 3448.1s	Train Loss: 2.002	Train Acc: 55.763%	Train ECE: 0.000
+Val Loss: 1.725	Val Acc: 60.302	Val top5 Acc: 82.204	Val ECE: 0.000	Best Acc: 60.454
+Epoch: 105	LearningRate: 0.00380602337443566	StepTemperature:0
+Epoch: 105	Time: 3450.3s	Train Loss: 2.000	Train Acc: 55.804%	Train ECE: 0.000
+Val Loss: 1.716	Val Acc: 60.428	Val top5 Acc: 82.246	Val ECE: 0.000	Best Acc: 60.454
+Epoch: 106	LearningRate: 0.00332097867513991	StepTemperature:0
+Epoch: 106	Time: 3422.6s	Train Loss: 1.998	Train Acc: 55.742%	Train ECE: 0.000
+Val Loss: 1.704	Val Acc: 60.416	Val top5 Acc: 82.582	Val ECE: 0.000	Best Acc: 60.454
+Epoch: 107	LearningRate: 0.002867925445391082	StepTemperature:0
+Epoch: 107	Time: 3398.7s	Train Loss: 1.993	Train Acc: 55.913%	Train ECE: 0.000
+Val Loss: 1.714	Val Acc: 60.442	Val top5 Acc: 82.106	Val ECE: 0.000	Best Acc: 60.454
+Epoch: 108	LearningRate: 0.002447174185242322	StepTemperature:0
+Epoch: 108	Time: 3360.9s	Train Loss: 1.991	Train Acc: 55.932%	Train ECE: 0.000
+Val Loss: 1.707	Val Acc: 60.498	Val top5 Acc: 82.332	Val ECE: 0.000	Best Acc: 60.498
+Epoch: 109	LearningRate: 0.0020590132565903516	StepTemperature:0
+Epoch: 109	Time: 3377.0s	Train Loss: 1.986	Train Acc: 56.028%	Train ECE: 0.000
+Val Loss: 1.699	Val Acc: 60.700	Val top5 Acc: 82.530	Val ECE: 0.000	Best Acc: 60.700
+Epoch: 110	LearningRate: 0.0017037086855465832	StepTemperature:0
+Epoch: 110	Time: 3396.7s	Train Loss: 1.984	Train Acc: 56.095%	Train ECE: 0.000
+Val Loss: 1.702	Val Acc: 60.760	Val top5 Acc: 82.544	Val ECE: 0.000	Best Acc: 60.760
+Epoch: 111	LearningRate: 0.0013815039801161712	StepTemperature:0
+Epoch: 111	Time: 3369.2s	Train Loss: 1.983	Train Acc: 56.133%	Train ECE: 0.000
+Val Loss: 1.711	Val Acc: 60.420	Val top5 Acc: 82.380	Val ECE: 0.000	Best Acc: 60.760
+Epoch: 112	LearningRate: 0.0010926199633097147	StepTemperature:0
+Epoch: 112	Time: 3388.8s	Train Loss: 1.980	Train Acc: 56.132%	Train ECE: 0.000
+Val Loss: 1.698	Val Acc: 60.798	Val top5 Acc: 82.484	Val ECE: 0.000	Best Acc: 60.798
+Epoch: 113	LearningRate: 0.000837254621802274	StepTemperature:0
+Epoch: 113	Time: 3398.8s	Train Loss: 1.977	Train Acc: 56.221%	Train ECE: 0.000
+Val Loss: 1.695	Val Acc: 60.790	Val top5 Acc: 82.672	Val ECE: 0.000	Best Acc: 60.798
+Epoch: 114	LearningRate: 0.0006155829702431166	StepTemperature:0
+Epoch: 114	Time: 3405.8s	Train Loss: 1.973	Train Acc: 56.309%	Train ECE: 0.000
+Val Loss: 1.696	Val Acc: 60.668	Val top5 Acc: 82.676	Val ECE: 0.000	Best Acc: 60.798
+Epoch: 115	LearningRate: 0.0004277569313094806	StepTemperature:0
+Epoch: 115	Time: 3403.3s	Train Loss: 1.974	Train Acc: 56.299%	Train ECE: 0.000
+Val Loss: 1.690	Val Acc: 60.666	Val top5 Acc: 82.702	Val ECE: 0.000	Best Acc: 60.798
+Epoch: 116	LearningRate: 0.00027390523158632977	StepTemperature:0
+Epoch: 116	Time: 3434.2s	Train Loss: 1.971	Train Acc: 56.336%	Train ECE: 0.000
+Val Loss: 1.686	Val Acc: 60.830	Val top5 Acc: 82.778	Val ECE: 0.000	Best Acc: 60.830
+Epoch: 117	LearningRate: 0.0001541333133436017	StepTemperature:0
+Epoch: 117	Time: 3434.0s	Train Loss: 1.968	Train Acc: 56.367%	Train ECE: 0.000
+Val Loss: 1.702	Val Acc: 60.632	Val top5 Acc: 82.500	Val ECE: 0.000	Best Acc: 60.830
+Epoch: 118	LearningRate: 6.852326227130829e-05	StepTemperature:0
+Epoch: 118	Time: 3446.0s	Train Loss: 1.970	Train Acc: 56.359%	Train ECE: 0.000
+Val Loss: 1.704	Val Acc: 60.664	Val top5 Acc: 82.414	Val ECE: 0.000	Best Acc: 60.830
+Epoch: 119	LearningRate: 1.7133751222136994e-05	StepTemperature:0
+Epoch: 119	Time: 3386.4s	Train Loss: 1.967	Train Acc: 56.445%	Train ECE: 0.000
+Val Loss: 1.693	Val Acc: 60.868	Val top5 Acc: 82.606	Val ECE: 0.000	Best Acc: 60.868
+Sample test: loss: 0.686, acc: 62.412%, top5 acc: 83.648%, ece: 0.000
+Total time: 185273.47238206863s
+
+==================================================

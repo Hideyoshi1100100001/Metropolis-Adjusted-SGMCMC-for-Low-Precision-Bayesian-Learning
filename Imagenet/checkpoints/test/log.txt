@@ -544,7 +544,7 @@ transitionKernel:	[1, 1]
 flipPossibility:	0.05
 fixed_lr:	False
 LoadPath:	./checkpoints/MH120
-SavePath:	./checkpoints/MH120
+SavePath:	./checkpoints/test
 saveInterval:	1
 evaluate:	False
 sampleNumber:	10
@@ -552,46 +552,11 @@ sampleInterval:	1
 deepEnsemble:	1
 ece:	False
 ecebins:	15
-MH:	True
+MH:	False
 MHInterval:	50
 MHEpsilon:	0.2
 debug_show_prob:	False
-manualSeed:	70
-Loading checkpoint './checkpoints/MH120/checkpoint.pth'
-Loaded checkpoint './checkpoints/MH120/checkpoint.pth' (epoch 73)
-Epoch: 73	LearningRate: 0.03330965703831143	StepTemperature:0
-data:	../../../LargeData/Large/ImageNet
-workers:	16
-gpu_id:	0,1,2,3,4,5,6
-fp:	False
-epochs:	120
-start_epoch:	0
-end_epoch:	120
-batch_size:	128
-MH_batch_size:	128
-lr:	0.1
-temperature:	0
-annealing:	1
-momentumDecay:	0.1
-priorSigma:	100.0
-quantizeDecay:	0
-transitionKernel:	[1, 1]
-flipPossibility:	0.05
-fixed_lr:	False
-LoadPath:	./checkpoints/MH120
-SavePath:	./checkpoints/MH120
-saveInterval:	1
-evaluate:	False
-sampleNumber:	10
-sampleInterval:	1
-deepEnsemble:	1
-ece:	False
-ecebins:	15
-MH:	True
-MHInterval:	50
-MHEpsilon:	0.2
-debug_show_prob:	False
-manualSeed:	21
+manualSeed:	3979
 Loading checkpoint './checkpoints/MH120/checkpoint.pth'
 Loaded checkpoint './checkpoints/MH120/checkpoint.pth' (epoch 73)
 Epoch: 73	LearningRate: 0.03330965703831143	StepTemperature:0

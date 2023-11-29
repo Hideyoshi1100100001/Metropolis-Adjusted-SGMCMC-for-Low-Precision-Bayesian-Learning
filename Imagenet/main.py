@@ -96,7 +96,11 @@ parser.add_argument('--MHEpsilon', default=2e-1, type=float, help='[0,1], larger
 parser.add_argument('--debug_show_prob', action='store_true', help='show the probability about MH test')
 
 #misc
-
+'''
+class DataLoaderX(torch.utils.data.DataLoader):
+    def __iter__(self):
+        return BackgroundGenerator(super().__iter__())
+'''
 parser.add_argument('--manualSeed', type=int, help='manual seed')
 
 args = parser.parse_args()
@@ -170,7 +174,7 @@ def imageNet():
             normalize,
         ])),
         batch_size=args.batch_size, shuffle=False,
-        num_workers=args.workers, pin_memory=False)
+        pin_memory=False)
     return datasize, train_loader, MH_loader, val_loader
 
 datasize, trainloader, MHloader, testloader = imageNet()
@@ -329,7 +333,7 @@ def train(start_epoch, best_prec, model, train_loader, test_loader, optimizer, l
                 t5pred = torch.topk(output.data, k=5, dim=1, largest=True)[1]
                 #print(output,'\n')
                 optimizer.zero_grad()
-                loss.backward(create_graph=True)
+                loss.backward(create_graph=True if args.MH else False)
 
                 if (False == args.MH):
                     optimizer.step()
